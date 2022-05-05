@@ -4,8 +4,8 @@ import fs from "fs";
 import axios from "axios";
 import { sleep } from "./utils/sleep";
 
-const projectId = "b4422fa99c934b8eb9e8dadf83341470";
-const count = 5;
+const projectId = "0085565dc4334564bdcbf9b8710e3180";
+const count = 1;
 
 const captcha2ApiKey = process.env.CAPTCHA2_API_KEY;
 const captchaMethod = "hcaptcha";
@@ -51,26 +51,35 @@ const getCaptchaResponse = async (actionId: number) => {
 
 const generateNftMakerAddress = async (captchaToken: string) => {
   try {
-    const response = await axios.get<string>(
+    console.log("projectId", projectId);
+    console.log("count", count);
+    console.log("captchaToken", captchaToken);
+
+    const response = await axios.get(
       "https://payment-api.nft-maker.io/api/v1/random/payment/address",
       {
         params: {
           projectId,
           count,
-          includeProtocolParameters: true,
+          // includeProtocolParameters: true,
         },
         headers: {
-          "c-token": captchaToken,
-          origin: "https://payment.nft-maker.io",
-          referer: "https://payment.nft-maker.io/",
-          "user-agent":
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.99 Safari/537.36 OPR/83.0.4254.27",
+          "C-Type": "hcaptcha",
+          "C-Token": captchaToken,
+          Origin: "https://payment.nft-maker.io",
+          Referer: "https://payment.nft-maker.io/",
+          "User-Agent":
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.4 Safari/605.1.15",
         },
       }
     );
-    console.log("generateNftMakerAddress", response.data);
-    return response.data;
+    console.log("nftMakerResponseStatus", response.status);
+    console.log("nftMakerResponseData", response.data);
+    console.log("generateNftMakerAddress", response.data.address);
+    return response.data.address;
   } catch (e) {
+    console.log("Error: response status", e.response.status);
+    console.log("Error: response data", e.response.data);
     return undefined;
   }
 };
